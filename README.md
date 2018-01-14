@@ -16,10 +16,17 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
 * Aprire Matlab e posizionarsi nella Directory dove è presente il file appena scaricato.
 * Da codice, digitare la seguente sintassi:
  
-        s = audioSync(audioIN, videoIN, Fs, fileOutput, toll) 
+        s = audioSync(videoIN, audioIN, Fs, fileOutput, toll) 
         
- dove:  `audioIN`= directory traccia audio secondaria
-        `videoIN`= directory traccia video principale
+ dove:  `audioIN`    = directory traccia audio secondaria
         
-
+        `videoIN`    = directory traccia video principale
+        
+        `Fs`         = frequenza di campionamento delle tracce audio e video
+        
+        `fileOutput` = directory nuova traccia audio sincronizzata
+        
+        `toll`       = tolleranza secondi di deriva
+       
+        
 
