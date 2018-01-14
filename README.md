@@ -10,3 +10,12 @@ L'obiettivo è quello di sincronizzare la traccia secondaria con il video. Oltre
 Il codice automaticamente esporta la traccia audio secondaria tagliata e corretta da errori e ritorna il numero di samples di differenza iniziale.
 
 
+## Installazione
+
+* Scaricare il file .m
+* Aprire Matlab e posizionarsi nella Directory dove è presente il file appena scaricato.
+* Da codice, digitare la seguente sintassi:
+ 
+        s = audioSync(audioIN, videoIN, Fs, 
+
+
