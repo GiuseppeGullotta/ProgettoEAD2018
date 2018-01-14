@@ -7,7 +7,7 @@ Il progetto caricato è stato implementato su Matlab (2017b). La funzione ha lo 
 
 L'obiettivo è quello di sincronizzare la traccia secondaria con il video. Oltre a sincronizzare le tracce, la funzione corregge la deriva della traccia secondaria (provocata, ad esempio, da differenti clock dei recorder) e rileva e corregge eventuali "pezzi estranei" presenti nella traccia audio aggiuntiva (come brevi silenzi).
 
-Il codice automaticamente esporta la traccia audio secondaria tagliata e corretta da errori e ritorna il numero di samples di differenza iniziale.
+Il codice automaticamente esporta la traccia audio secondaria tagliata e corretta da errori e ritorna il numero di samples di differenza iniziale. Inoltre, il codice fornisce all'utente
 
 
 ## Installazione
@@ -18,7 +18,9 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
  
         s = audioSync(videoIN, audioIN, Fs, fileOutput, toll) 
         
- dove:  `audioIN`    = directory traccia audio secondaria
+ dove:  
+ 
+        `audioIN`    = directory traccia audio secondaria
         
         `videoIN`    = directory traccia video principale
         
@@ -26,7 +28,20 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
         
         `fileOutput` = directory nuova traccia audio sincronizzata
         
-        `toll`       = tolleranza secondi di deriva
-       
+        `toll`       = tolleranza secondi di dissincronismo     (se non si sa che paramentro inserire, digitare 0.1)
+     
+     
+* Eseguire la funzione
+
+
+## Sviluppatori
+
+[Giuseppe Gullotta](https://github.com/GiuseppeGullotta)
+
+[Liliana Scaffidi](https://github.com/LilianaScaffidi)
+
+
+
+
         
 
