@@ -39,7 +39,7 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
 * La deriva funziona solamente se la seconda traccia è in ritardo rispetto a quella video.
 
 ### Esempio di utilizzo
-Scaricare i file di esempio cliccando [qui](https://github.com/GiuseppeGullotta)
+Scaricare i file di esempio cliccando [qui](https://drive.google.com/drive/folders/1y2ze7OLnI-feHuuXNQVXRHRoOBnEKxfX?usp=sharing)
 
 > audioIN = 'video.mp4';
 
