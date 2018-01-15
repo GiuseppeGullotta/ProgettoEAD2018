@@ -1,6 +1,6 @@
 function [c] = syncAudio(videoIN, audioIN, FsIN, fileOutput, toll)
 
-%SINCRONIZZAZIONE This function save an audio file syncronized with another
+%syncAudio This function saves an audio file synchronized with another
 %                 track from a video file.
 %
 %   [c] = syncAudio(video, audio, FsIN, fileOutput)
@@ -14,14 +14,14 @@ function [c] = syncAudio(videoIN, audioIN, FsIN, fileOutput, toll)
 %   IMPORTANT: the input files must have the same FsIN!
 %
 %   Copyright 2017 Giuseppe Gullotta and Liliana Scaffidi.
-%   This code is made for curse of Digital Audio Processing 
+%   This code is made for the course of Digital Audio Processing 
 %   of Politecnico di Torino.
 %
-%   We don't know if it works with all of audio and video files
-%   but we try to resolve it.
+%   We don't know if it works with all of the audio and video files
+%   but we will try to solve it.
 %
-%   I prefer to use directly de delayFunction in this
-%   code, to emprove time of computing
+%   I prefer to use directly the delayFunction in this
+%   code, to improve the time of computing
 %
 %   LIMITATION:   --> DRIFT: works only if audio is late compared to video
 %                 --> GAP: it's possible to correct only silence gap
@@ -71,7 +71,7 @@ while flag == 0
 
     window_end = FsIN * window_length * (n+1);
     
-    % Sync Analisys in this window
+    % Sync Analysis in this window
     
     % Cross-Correlation function
     [AV, lagAV] = xcorr(audio(window_start:window_end), video(window_start:window_end));
@@ -82,7 +82,7 @@ while flag == 0
     % Find delay in samples
     tAV = lagAV(IAV);
     
-    % Print results of analisys
+    % Print results of analysis
     fprintf('Segment %d  |  IN: %d  |  OUT: %d  -->  %d\n', n, window_start, window_end, tAV);
     
     % Check if segment is smaller than tollerance
