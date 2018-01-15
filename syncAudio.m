@@ -64,51 +64,51 @@ toll = FsIN * toll;         % tolleranza (in samples)
 tAV_old = 0;                % variabile temporanea
 window_start = 1;           % valore di inizio intervallo di analisi
 
-% Check Sync Function
+% Inizo ricerca
 fprintf('ANALISYS FILES\n')
 
 while flag == 0
 
     window_end = FsIN * window_length * (n+1);
     
-    % Sync Analysis in this window
     
-    % Cross-Correlation function
+    % Cross-Correlazione 
     [AV, lagAV] = xcorr(audio(window_start:window_end), video(window_start:window_end));
     AV = AV/max(AV);
 
     [~, IAV] = max(AV);
 
-    % Find delay in samples
+    % Differenza, in campioni, tra le tracce 
     tAV = lagAV(IAV);
     
-    % Print results of analysis
+    % Stampa a video i risultati dell'analisi
     fprintf('Segment %d  |  IN: %d  |  OUT: %d  -->  %d\n', n, window_start, window_end, tAV);
     
-    % Check if segment is smaller than tollerance
-    % it means that delay has been found
+    % Controlla se il segmento trovato è minore della tolleranza
+    % Se è minore, il delay è stato trovato
     if abs(tAV - tAV_old) <= toll
         flag = 1;
-        % I prefer to use next window_end for a better result
+        % Preferiamo utilizzare la successiva window_end (quindi maggiorata di 1) per un migliore risultato
+        % Da implementare: se tAV_old = 0 il sincronismo è già nel primo segmento
         segment = [window_start, FsIN * window_length * (n+2)];    
     end
     
-    tAV_old = tAV;
+    tAV_old = tAV; 
     n = n + 1;
     
-    % Check if audio or video are finished
+    % Controlla se le tracce audio o video sono terminate
     if FsIN * window_length * (n+2) > infoAudio.TotalSamples || FsIN * window_length * (n+2) > infoVideo.TotalSamples
         error('Sync not found!');
     end
 
 end
 
-%Check if window_end is bigger than TotalSamples
+% Controlla se window_end è più grande di TotalSamples
 if segment(2) > infoAudio.TotalSamples || segment(2) > infoVideo.TotalSamples
     segment(2) = minSamples;
 end
 
-% Print window analisys 
+% Stampa la finestra di analisi
 fprintf('--------------\n');
 fprintf('Sync founded between %d and %d samples\n', segment(1), segment(2));
 fprintf('--------------\n');
@@ -119,27 +119,27 @@ fprintf('SYNC FILES\n')
 % Sync Analisys in Segment
 
 
-% Cross-Correlation function
+% Cross-Correlazione 
 [AV, lagAV] = xcorr(audio(segment(1):segment(2)), video(segment(1):segment(2)));
 AV = AV/max(AV);
 
 [~, IAV] = max(AV);
 
-% Find delay in samples
+% Differenza, in campioni, tra le tracce 
 tAV = lagAV(IAV);
 
-% Print Delay both in Samples than in Second
+% Stampa il ritardo sia in campioni che in secondi
 fprintf('Delay: %d samples\n', tAV);
 fprintf('Delay: %d seconds\n',tAV/FsIN);
 
-% Return tAV
+% Ritorna tAV
 c = tAV;
 
 % Sync Temporary Audio
 y = audioread(audioIN);
 
-% If tAV > 0 cut the first part of audio
-% else add silence before starting time of audio
+% Se tAV > 0 taglia la prima parte dell'audio
+% altrimenti aggiunge silenzio all'inizio dell'audio
 if tAV >= 0
     audioCut = y(tAV:end);
 else
