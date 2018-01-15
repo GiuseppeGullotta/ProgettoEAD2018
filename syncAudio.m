@@ -168,7 +168,7 @@ while window_end < minSamples
 
     [~, IAV] = max(AV);
 
-    %  Differenza, in campioni, tra le tracce 
+    % Differenza, in campioni, tra le tracce 
     drift(n) = lagAV(IAV);
     
     % Valori deriva
@@ -201,8 +201,8 @@ fprintf('--------------\n')
 % Correzione dei gap
 fprintf('CORRECTION AUDIO GAPS\n')
 
-tollSamp = 0.02;                % 20 ms tollerance
-tollGap = tollSamp * FsIN;      % Tollerance in samples
+tollSamp = 0.02;                % 20 ms tolleranza
+tollGap = tollSamp * FsIN;      % Tolleranza in campioni
 
 offset = 0;
 flag = true;
@@ -250,44 +250,44 @@ fprintf('--------------\n')
 % Allineamento Audio e Video
 fprintf('ALIGN AUDIO AND VIDEO\n')
 
-% ciò è utile sia per la correzione della deriva che per l'export finale
+% Ciò è utile sia per la correzione della deriva che per l'export finale
 % Il video rimane il master e non deve essere toccato
 
 if length(audioCut) < infoVideo.TotalSamples
-    % If video is longer than audio
-    % add silence at the end of audio
+    % Se il video è più lungo dell'audio
+    % aggiunge silenzio alla fine dell'audio
     d = infoVideo.TotalSample - length(audioCut);
     h = zero(d, 1);
     audioCut = vertcat(audioCut, d);
 else
-    % If audio is longer than video
-    % cut audio at the end 
+    % Se l'audio è più lungo del video 
+    % taglia l'audio alla fine
     d = length(audioCut) - infoVideo.TotalSamples;
     audioCut = audioCut(1:end-d);
 end
 
 fprintf('--------------\n')
 
-% Drift Correction
+% Correzione deriva
 fprintf('DRIFT CORRECTION\n')
 
-% Compute cross-correlation at the end of files and remove a single sample
-% at every round(TotalSamples/tAV)
+% Calcola la cross-correlazione alla fine dei files e rimuove un singolo campione
+% ad ogni round(TotalSamples/tAV)
 
-% Cross-Correlation function
+% Cross-Correlazione 
 [AV, lagAV] = xcorr(audioCut(end - FsIN * window_length : end), video(end - FsIN * window_length : end));
 AV = AV/max(AV);
 
 [~, IAV] = max(AV);
 
-% Find delay in samples
+% Differenza, in campioni, tra le tracce
 tAV = lagAV(IAV);
 
-% Print result
+% Stampa il risultato
 fprintf('Final drift: %d samples\n', tAV);
 fprintf('--------------\n')
 
-% Drift alignment
+% Allineamento deriva
 m = round(length(audioCut)/tAV);
 sampleToBeDelete = zeros(m, 1);
 
@@ -316,15 +316,15 @@ for n = 1:length(audioCut)
 end
 
 
-% Final Export
+% Export finale
 fprintf('--------------\n')
 fprintf('Final Export\n')
 audiowrite(fileOutput, audioFinal, FsIN);
 
-% I have problem with ffmpeg installer 
+% Ci sono problemi con ffmpeg  
 % ffmpeg('-i', videoIN, '-i', 'audioSincronizzato.wav', fileOutput);
 
-% End
+% Fine
 fprintf('--------------\n')
 fprintf('END\n')
 fprintf('--------------\n')
