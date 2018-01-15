@@ -96,16 +96,11 @@ while flag == 0
     tAV_old = tAV; 
     n = n + 1;
     
-    % Controlla se le tracce audio o video sono terminate
+    % Controlla se la successiva finestra di osservazione è più grande della lunghezza del minore tra i file audio o video 
     if FsIN * window_length * (n+2) > infoAudio.TotalSamples || FsIN * window_length * (n+2) > infoVideo.TotalSamples
         error('Sync not found!');
     end
 
-end
-
-% Controlla se window_end è più grande di TotalSamples
-if segment(2) > infoAudio.TotalSamples || segment(2) > infoVideo.TotalSamples
-    segment(2) = minSamples;
 end
 
 % Stampa la finestra di analisi
@@ -113,10 +108,8 @@ fprintf('--------------\n');
 fprintf('Sync founded between %d and %d samples\n', segment(1), segment(2));
 fprintf('--------------\n');
 
-% Sync Function Start
+% Inizio ricerca finestra di sincronizzazione
 fprintf('SYNC FILES\n')
-
-% Sync Analisys in Segment
 
 
 % Cross-Correlazione 
@@ -135,8 +128,9 @@ fprintf('Delay: %d seconds\n',tAV/FsIN);
 % Ritorna tAV
 c = tAV;
 
-% Sync Temporary Audio
-y = audioread(audioIN);
+
+% Inizio sincronizzazione
+y = audio;
 
 % Se tAV > 0 taglia la prima parte dell'audio
 % altrimenti aggiunge silenzio all'inizio dell'audio
@@ -150,37 +144,37 @@ end
 
 fprintf('--------------\n');
 
-% Start Drift Analisys 
+% Inizio analisi deriva 
 fprintf('DRIFT ANALISYS\n')
 
-% Create new array for drift
+% Creazione nuovo array per la deriva
 minSamples = min(length(audioCut), infoVideo.TotalSamples);
 sizeDrift = round(minSamples/(FsIN * window_second)) - 1;
 drift = zeros(sizeDrift, 1);
 
-% First window 
+% Prima finestra 
 window_start = 1;
 window_end = FsIN * window_second;
 
-n = 1;  % Counter
+n = 1;  % contatore
 
 h = waitbar(0, 'Drift Analisys...');
 
 while window_end < minSamples
     
-    % Cross-Correlation function
+    % Cross-Correlazione
     [AV, lagAV] = xcorr(audioCut(window_start:window_end), video(window_start:window_end));
     AV = AV/max(AV);
 
     [~, IAV] = max(AV);
 
-    % Find delay in samples
+    %  Differenza, in campioni, tra le tracce 
     drift(n) = lagAV(IAV);
     
-    % Report drift values
+    % Valori deriva
     % fprintf('%d |  IN: %d OUT: %d  \t | \t Drift(%d) = %d \t|\n', n, window_start, window_end, n, drift(n));
 
-    % Update window
+    % Aggiornamento finestra 
     window_start = window_end + 1;
     window_end = (window_start - 1) + FsIN * window_second;
     n = n + 1;
@@ -191,7 +185,7 @@ end
 
 close(h);
 
-% Plot Drift
+% Plot deriva
 fprintf('--------------\n')
 fprintf('PLOTTING DRIFT\n')
 
@@ -204,7 +198,7 @@ title('DRIFT')
 
 fprintf('--------------\n')
 
-% Correction of gaps
+% Correzione dei gap
 fprintf('CORRECTION AUDIO GAPS\n')
 
 tollSamp = 0.02;                % 20 ms tollerance
@@ -215,30 +209,30 @@ flag = true;
 
 for n = 2 : length(drift)
     
-    % Check difference between drift 
+    % Ricerca differenza tra derive
     if abs(drift(n) - drift(n-1)) > tollGap
         flag = false;
         window_start = ((n-1) * FsIN * window_second) + 1;
         window_end = n * FsIN * window_second;
         
-        % if xcorr > 0   audio in advance  -->   add silence
-        % if xcorr < 0   delayed audio     -->   remove samples
+        % se xcorr > 0   audio in anticipo  -->   aggiungere silenzio
+        % se xcorr < 0   audio in ritardo   -->   rimuovere campioni
         
-        % Cross-Correlation function
+        % Cross-Correlazione 
         [AV, lagAV] = xcorr(audioCut(window_start:window_end), video(window_start:window_end));
         AV = AV/max(AV);
 
         [~, IAV] = max(AV);
 
-        % Find delay in samples
+        % Differenza, in campioni, tra le tracce 
         tAV = lagAV(IAV);
         
-        % Print gap founded
+        % Stampa gap trovato
         fprintf('GAP @ %d\n', window_start+tAV);
         
-        % Correction Gap
+        % Correzione gap
         if tAV > 0
-           % Remove samples
+           % Rimozione campioni
            audioCut = vertcat(audioCut(1:window_start-offset), audioCut(window_start-offset+tAV:end));
         else
            % da implementare
@@ -253,11 +247,11 @@ if flag
 end
 fprintf('--------------\n')
 
-% Align Audio and Video
+% Allineamento Audio e Video
 fprintf('ALIGN AUDIO AND VIDEO\n')
 
-% this is useful both for final export and drift correction
-% Video is master and it must not be touched
+% ciò è utile sia per la correzione della deriva che per l'export finale
+% Il video rimane il master e non deve essere toccato
 
 if length(audioCut) < infoVideo.TotalSamples
     % If video is longer than audio
