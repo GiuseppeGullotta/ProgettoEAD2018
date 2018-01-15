@@ -33,8 +33,20 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
      
 * Eseguire la funzione
 
-## Limitazioni
-Le tracce audio devono essere passate alla funzione tramite percorso
+## Limiti del codice 
+* Attualmente, non è possibile inserire tracce con frequenza di campionamento differente. Questo problema sarà risolto successivamente, implementando una funzione che permetta di ricampionare la traccia audio con frequenza di campionamento maggiore e riportandola a quella minore. 
+* Il codice è stato prototipato per uno specifico task e potrebbe non essere adatto con altre esigenze.
+* La deriva funziona solamente se la seconda traccia è in ritardo rispetto a quella video.
+
+### Esempio di utilizzo
+Scaricare i file di esempio cliccando [qui](https://github.com/GiuseppeGullotta)
+
+> audioIN = 'video.mp4';
+> audioIN = 'audio.3gpp';
+> FsIN = 44100;
+> fileOutput = 'audioSincronizzato.mp4';
+> toll = 0.1;
+> s = audioSync(videoIN, audioIN, FsIN, fileOutput, toll);
 
 
 ## Sviluppatori
