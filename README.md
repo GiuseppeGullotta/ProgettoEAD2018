@@ -42,11 +42,17 @@ Il codice automaticamente esporta la traccia audio secondaria tagliata e corrett
 Scaricare i file di esempio cliccando [qui](https://github.com/GiuseppeGullotta)
 
 > audioIN = 'video.mp4';
+
 > audioIN = 'audio.3gpp';
+
 > FsIN = 44100;
+
 > fileOutput = 'audioSincronizzato.mp4';
+
 > toll = 0.1;
+
 > s = audioSync(videoIN, audioIN, FsIN, fileOutput, toll);
+
 
 
 ## Sviluppatori
