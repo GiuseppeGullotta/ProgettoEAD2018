@@ -1,7 +1,7 @@
 function [c] = syncAudio(videoIN, audioIN, FsIN, fileOutput, toll)
 
-%syncAudio This function saves an audio file synchronized with another
-%                 track from a video file.
+%syncAudio Questa funzione salva un file audio sicronizzato con un'altra traccia 
+%                 audio proveniente da un file video.
 %
 %   [c] = syncAudio(video, audio, FsIN, fileOutput)
 %
@@ -11,20 +11,20 @@ function [c] = syncAudio(videoIN, audioIN, FsIN, fileOutput, toll)
 %   fileOutput  =   destination of final audio track  
 %   toll        =   tollerance (in seconds)
 %
-%   IMPORTANT: the input files must have the same FsIN!
+%   IMPORTANTE: i file di input devono avere la stessa frequenza di campionamento FsIN!
 %
-%   Copyright 2017 Giuseppe Gullotta and Liliana Scaffidi.
-%   This code is made for the course of Digital Audio Processing 
-%   of Politecnico di Torino.
+%   Copyright 2017 Giuseppe Gullotta e Liliana Scaffidi.
+%   Questo codice è stato realizzato per il corso di Elaborazione dell'audio digitale
+%   presso il Politecnico di Torino.
 %
-%   We don't know if it works with all of the audio and video files
-%   but we will try to solve it.
+%   Non sappiamo se questo codice funiona con tutti i tipi di file audio e video 
+%   però proveremo a correggere qualsiasi problema riscontrato in futuro.
 %
-%   I prefer to use directly the delayFunction in this
-%   code, to improve the time of computing
+%   Abbiamo qui preferito utilizzare direttamente un'unica funzione per l'intero processo 
+%   (anzichè più funzioni richiamate esternamente) per ottimizzare il codice a livello computazionale.
 %
-%   LIMITATION:   --> DRIFT: works only if audio is late compared to video
-%                 --> GAP: it's possible to correct only silence gap
+%   LIMITI:   --> DRIFT: funziona solamente se la traccia audio è il ritardo rispetto a quella video
+%             --> GAP: riesce a rilevare soltanto i vuoti dovuti al silenzio
 %         
 
 
@@ -33,7 +33,7 @@ fprintf('--------------\n');
 fprintf('START\n')
 fprintf('--------------\n');
 
-% Check adaptive window for input files
+% Ricerca della dimensione della finestra di osservazone dei file in input 
 fprintf('Read audio file\n')
 audio = audioread(audioIN);
 infoAudio = audioinfo(audioIN);
@@ -46,23 +46,23 @@ fprintf('--------------\n')
 
 minSamples = min(infoAudio.TotalSamples, infoVideo.TotalSamples);
 
-% Check if audio files are longer than an hour
-% window_length is for SyncFunction
-% window_second is for DriftCheckFunction and DriftCorrectionFunction
-if minSamples < 3600 * FsIN         % 60 minutes
-    window_length = 30;             % 30 seconds
-    window_second = 5;              % 5 seconds
+% Ricerca se i file audio hanno durata maggiore di un'ora
+% window_length è per la parte relativa alla sincronizzazione
+% window_second viene utilizzata per la deriva
+if minSamples < 3600 * FsIN         % 60 minuti
+    window_length = 30;             % 30 secondi
+    window_second = 5;              % 5 secondi
 else
-    window_length = 60;             % 60 seconds
-    window_second = 10;             % 10 seconds
+    window_length = 60;             % 60 secondi
+    window_second = 10;             % 10 secondi
 end
 
-% Check Sync Window
-flag = 0;                   % Utility for while cycle
-n = 0;                      % Counter
-toll = FsIN * toll;         % Tollerance (in samples)
-tAV_old = 0;                % Temporary variable
-window_start = 1;           % First start interval
+% Ricerca della finestra di sincronizzazione
+flag = 0;                   
+n = 0;                      % contatore
+toll = FsIN * toll;         % tolleranza (in samples)
+tAV_old = 0;                % variabile temporanea
+window_start = 1;           % valore di inizio intervallo di analisi
 
 % Check Sync Function
 fprintf('ANALISYS FILES\n')
