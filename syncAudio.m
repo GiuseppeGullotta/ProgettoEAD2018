@@ -65,7 +65,7 @@ tAV_old = 0;                % variabile temporanea
 window_start = 1;           % valore di inizio intervallo di analisi
 
 % Inizo ricerca
-fprintf('ANALISYS FILES\n')
+fprintf('ANALISI DEI FILE\n')
 
 while flag == 0
 
@@ -82,7 +82,7 @@ while flag == 0
     tAV = lagAV(IAV);
     
     % Stampa a video i risultati dell'analisi
-    fprintf('Segment %d  |  IN: %d  |  OUT: %d  -->  %d\n', n, window_start, window_end, tAV);
+    fprintf('Segmento %d  |  IN: %d  |  OUT: %d  -->  %d\n', n, window_start, window_end, tAV);
     
     % Controlla se il segmento trovato è minore della tolleranza
     % Se è minore, il delay è stato trovato
@@ -98,18 +98,18 @@ while flag == 0
     
     % Controlla se la successiva finestra di osservazione è più grande della lunghezza del minore tra i file audio o video 
     if FsIN * window_length * (n+2) > infoAudio.TotalSamples || FsIN * window_length * (n+2) > infoVideo.TotalSamples
-        error('Sync not found!');
+        error('Sincronismo non trovato!');
     end
 
 end
 
 % Stampa la finestra di analisi
 fprintf('--------------\n');
-fprintf('Sync founded between %d and %d samples\n', segment(1), segment(2));
+fprintf('Sincronismo compreso tra %d e %d samples\n', segment(1), segment(2));
 fprintf('--------------\n');
 
 % Inizio ricerca finestra di sincronizzazione
-fprintf('SYNC FILES\n')
+fprintf('SINCRONIZZAZIONE FILE\n')
 
 
 % Cross-Correlazione 
@@ -123,7 +123,7 @@ tAV = lagAV(IAV);
 
 % Stampa il ritardo sia in campioni che in secondi
 fprintf('Delay: %d samples\n', tAV);
-fprintf('Delay: %d seconds\n',tAV/FsIN);
+fprintf('Delay: %d secondi\n',tAV/FsIN);
 
 % Ritorna tAV
 c = tAV;
@@ -145,7 +145,7 @@ end
 fprintf('--------------\n');
 
 % Inizio analisi deriva 
-fprintf('DRIFT ANALISYS\n')
+fprintf('ANALISI DELLA DERIVA\n')
 
 % Creazione nuovo array per la deriva
 minSamples = min(length(audioCut), infoVideo.TotalSamples);
@@ -158,7 +158,7 @@ window_end = FsIN * window_second;
 
 n = 1;  % contatore
 
-h = waitbar(0, 'Drift Analisys...');
+h = waitbar(0, 'Analisi della deriva...');
 
 while window_end < minSamples
     
@@ -172,6 +172,7 @@ while window_end < minSamples
     drift(n) = lagAV(IAV);
     
     % Valori deriva
+    % da usare solo in caso di debugging
     % fprintf('%d |  IN: %d OUT: %d  \t | \t Drift(%d) = %d \t|\n', n, window_start, window_end, n, drift(n));
 
     % Aggiornamento finestra 
@@ -187,7 +188,7 @@ close(h);
 
 % Plot deriva
 fprintf('--------------\n')
-fprintf('PLOTTING DRIFT\n')
+fprintf('PLOTTING DERIVA\n')
 
 t_drift = (0 : FsIN * window_second : FsIN * (n-2) * window_second) / FsIN;
 
@@ -199,7 +200,7 @@ title('DRIFT')
 fprintf('--------------\n')
 
 % Correzione dei gap
-fprintf('CORRECTION AUDIO GAPS\n')
+fprintf('CORREZIONE AUDIO\n')
 
 tollSamp = 0.02;                % 20 ms tolleranza
 tollGap = tollSamp * FsIN;      % Tolleranza in campioni
@@ -228,7 +229,7 @@ for n = 2 : length(drift)
         tAV = lagAV(IAV);
         
         % Stampa gap trovato
-        fprintf('GAP @ %d\n', window_start+tAV);
+        fprintf('Trovato problema dal campione %d\n', window_start+tAV);
         
         % Correzione gap
         if tAV > 0
@@ -243,12 +244,12 @@ for n = 2 : length(drift)
 end
 
 if flag
-    fprintf('No gap founded')
+    fprintf('Nessun errore trovato!')
 end
 fprintf('--------------\n')
 
 % Allineamento Audio e Video
-fprintf('ALIGN AUDIO AND VIDEO\n')
+fprintf('ALLINEAMENTO AUDIO\n')
 
 % Ciò è utile sia per la correzione della deriva che per l'export finale
 % Il video rimane il master e non deve essere toccato
@@ -269,7 +270,7 @@ end
 fprintf('--------------\n')
 
 % Correzione deriva
-fprintf('DRIFT CORRECTION\n')
+fprintf('CORREZIONE DERIVA\n')
 
 % Calcola la cross-correlazione alla fine dei files e rimuove un singolo campione
 % ad ogni round(TotalSamples/tAV)
@@ -283,8 +284,8 @@ AV = AV/max(AV);
 % Differenza, in campioni, tra le tracce
 tAV = lagAV(IAV);
 
-% Stampa il risultato
-fprintf('Final drift: %d samples\n', tAV);
+% Stampa la deriva finale
+fprintf('Deriva finale: %d samples\n', tAV);
 fprintf('--------------\n')
 
 % Allineamento deriva
@@ -293,15 +294,13 @@ sampleToBeDelete = zeros(m, 1);
 
 t = length(audioCut);
 
-fprintf('Calculate samples to be removed\n')
+fprintf('CORREZIONE DERIVA FINALE\n')
 
 count = 1;
 for n = 1:m:t
     sampleToBeDelete(count) = n;
     count = count + 1;
 end
-
-fprintf('Final Correction\n')
 
 count = 1;
 audioFinal = zeros(t,1);
@@ -318,10 +317,11 @@ end
 
 % Export finale
 fprintf('--------------\n')
-fprintf('Final Export\n')
+fprintf('EXPORT FINALE\n')
 audiowrite(fileOutput, audioFinal, FsIN);
 
-% Ci sono problemi con ffmpeg  
+% Ci sono problemi con il plugin ffmpeg e non siamo riusciti ad integrarlo
+% per problemi legati all'ambiente di sviluppo
 % ffmpeg('-i', videoIN, '-i', 'audioSincronizzato.wav', fileOutput);
 
 % Fine
